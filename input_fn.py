@@ -41,12 +41,11 @@ def input_fn(tfrecord_ds_path=None, batch_size=None):
     if not batch_size:
         batch_size = BATCH_SIZE
 
-    dataset = tf.data.TFRecordDataset([tfrecord_ds_path]).map(
-        lambda record: parse(record)).shuffle(100).batch(batch_size)
-        # lambda record: parse(record)).batch(batch_size)
-
-        # lambda record: parse(record)).shuffle(100).batch(12)
-        # 100).repeat().batch(12)
+    dataset = tf.data.TFRecordDataset([tfrecord_ds_path])
+        .map(lambda record: parse(record))
+        .shuffle(100)
+        .batch(batch_size)
+        .repeat()
 
     return dataset
 
