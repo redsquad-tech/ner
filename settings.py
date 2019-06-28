@@ -1,5 +1,5 @@
 import os
-RESOURCES_PATH = "./res"
+RESOURCES_PATH = "./models"
 
 BERT_MODEL_PATH = os.path.join(RESOURCES_PATH, 'rubert_cased_L-12_H-768_A-12_v1')
 BERT_CONFIG_PATH = os.path.join(RESOURCES_PATH, 'rubert_cased_L-12_H-768_A-12_v1/bert_config.json')
