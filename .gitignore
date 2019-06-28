@@ -1,0 +1,9 @@
+env/
+__pycache__/
+.vscode/
+target/
+resources/
+.idea/
+*venv*/
+experiments
+*.pyc
