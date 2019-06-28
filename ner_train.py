@@ -11,7 +11,7 @@ from input_fn import serving_input_receiver_fn
 
 def main(train_dataset_path, model_save_path, batch_size, *args, **kwargs):
     # load bert as Estimator:
-    bert_ner_estimator = get_estimator()
+    bert_ner_estimator = get_estimator(model_save_path)
 
     start = time.clock()
     start_dt = dt.datetime.now()

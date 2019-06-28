@@ -91,10 +91,10 @@ my_checkpointing_config = tf.estimator.RunConfig(
 )
 
 
-def get_estimator():
+def get_estimator(model_save_path):
     return tf.estimator.Estimator(
         model_fn=model_fn,
         params={},
-        model_dir=BERT_MODEL_PATH,
+        model_dir=model_save_path + '/process',
         config=my_checkpointing_config
     )
