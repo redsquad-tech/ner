@@ -64,7 +64,7 @@ def main(train_dataset_path, eval_dataset_path, batch_size):
     # load bert as Estimator:
     bert_ner_estimator = get_estimator()
 
-    early_stopping = tf.contrib.estimator.stop_if_no_decrease_hook(
+    early_stopping = tf.estimator.stop_if_no_decrease_hook(
         bert_ner_estimator,
         metric_name='loss',
         max_steps_without_decrease=1000,
