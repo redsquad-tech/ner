@@ -239,15 +239,9 @@ def bert_ner_core(input_ids_ph, input_masks_ph, y_masks_ph, y_ph, train_mode=Tru
         # tags = tf.argmax(tranformed_logits, -1)
         # y_probas = tf.nn.softmax(tranformed_logits, axis=2)
 
-    # sess.run(tf.global_variables_initializer())
 
     variables_to_train = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
-    # saver = tf.train.Saver()
-    # saver.restore(sess, '../resources/ner_rus_bert/model')
-    # print("tf.GraphKeys.TRAINABLE_VARIABLES")
-    # print(variables_to_train)
     if train_mode:
-        # opt_scope = tf.variable_scope('Optimizer', reuse=tf.AUTO_REUSE)
         with tf.variable_scope('Optimizer'):
             # For batch norm it is necessary to update running averages
             extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -255,7 +249,6 @@ def bert_ner_core(input_ids_ph, input_masks_ph, y_masks_ph, y_ph, train_mode=Tru
                 # optimizer = tf.train.AdagradOptimizer(learning_rate=0.1)
                 optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE)
 
-                # print(variables_to_train)
                 grads_and_vars = optimizer.compute_gradients(loss_op, var_list=variables_to_train)
                 train_op = optimizer.apply_gradients(grads_and_vars, global_step=tf.train.get_global_step())
         return y_predictions, train_op, loss_op
