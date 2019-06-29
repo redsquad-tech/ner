@@ -72,8 +72,7 @@ def main(train_dataset_path, eval_dataset_path, model_save_path, batch_size):
 
     eval_spec = tf.estimator.EvalSpec(
         input_fn = functools.partial(input_fn, tfrecord_ds_path=eval_dataset_path, batch_size=batch_size),
-        throttle_secs=120,
-        start_delay_secs=120,
+        steps=128,
         exporters=[export]
     )
 

@@ -72,9 +72,9 @@ strategy = tf.contrib.distribute.MirroredStrategy()
 
 my_checkpointing_config = tf.estimator.RunConfig(
     # save_checkpoints_secs=60,
-    save_checkpoints_steps=20,
+    save_checkpoints_steps=64,
     keep_checkpoint_max=8,
-    save_summary_steps=20,
+    save_summary_steps=64,
     train_distribute=strategy,
 )
 
