@@ -89,6 +89,6 @@ if __name__=="__main__":
     parser.add_argument('--train_dataset', help='Path to TFRecord dataset for training', default='data/train.tfrecord', type=str)
     parser.add_argument('--eval_dataset', help='Path to TFRecord dataset for evaluation', default='data/valid.tfrecord', type=str)
     parser.add_argument('--model_save_path', help='Path to save the resulting model', default='model/BERT_NER_ESTIMATOR', type=str)
-    parser.add_argument('--batch_size', help='Size of Batch', default=16, type=int)
+    parser.add_argument('--batch_size', help='Size of Batch', default=8, type=int)
     args = parser.parse_args()
     main(args.train_dataset, args.eval_dataset, args.model_save_path, args.batch_size)
