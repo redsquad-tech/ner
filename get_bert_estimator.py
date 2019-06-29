@@ -1,5 +1,4 @@
 import tensorflow as tf
-# from tf_metrics import f1
 
 from settings import BERT_MODEL_PATH, TAGS_MAP
 from bert_ner_core import bert_ner_core
@@ -31,8 +30,7 @@ def model_fn(features, labels, mode, params):
         )
 
     # Train or Eval case goes here:
-    y_predictions, train_op, loss_op = bert_ner_core(input_ids_ph, input_masks_ph, y_masks_ph,
-                                                     y_ph, train_mode=True)
+    y_predictions, train_op, loss_op = bert_ner_core(input_ids_ph, input_masks_ph, y_masks_ph, y_ph, train_mode=True)
     labels_shape = tf.cast(tf.shape(labels), tf.int32)
     labels_size = labels_shape[1]
     ys_shape = tf.cast(tf.shape(y_predictions), tf.int32)
@@ -53,18 +51,6 @@ def model_fn(features, labels, mode, params):
         'recall': tf.metrics.recall(labels=labels,
                                     predictions=y_predictions_padded,
                                     name='recall_op'),
-        # TODO why f1 doesnt work with error:
-        # tensorflow.python.framework.errors_impl.InvalidArgumentError: assertion failed: [predictions must be in [0, 1]] [Condition x <= y did not hold element-wise:x (Pad:0) = ] [[0 0 0...]...] [y (f1_op/Cast_1:0) = ] [1]
-        # 	 [[node f1_op/assert_less_equal/Assert/AssertGuard/Assert (defined at /home/alx/Workspace/dp_bert_ner/get_bert_estimator.py:59) ]]
-
-        # 'f1': tf.contrib.metrics.f1_score(labels=labels,
-        #                                   predictions=y_predictions_padded,
-        #                                   name='f1_op',
-        #                                   num_thresholds=1,
-        #                                   ),
-        # 'f1': f1(labels=labels,
-        #          predictions=y_predictions_padded,
-        #          num_classes=len(TAGS_MAP.keys())),
     }
     for metric_name, op in metrics.items():
         tf.summary.scalar(metric_name, op[1])

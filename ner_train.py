@@ -1,55 +1,97 @@
 #!/usr//bin/env python3
 
 from get_bert_estimator import get_estimator
-from input_fn import input_fn
 import argparse
 import time
 import datetime as dt
 import functools
-from input_fn import serving_input_receiver_fn
+import tensorflow as tf
 
 
-def main(train_dataset_path, model_save_path, batch_size, *args, **kwargs):
+from settings import BATCH_SIZE
+
+
+def parse(serialized_example):
+    """
+    Function adapts features for the Estimator format
+    :param serialized_example:
+    :return:
+    """
+    features_spec = {
+        'input_ids': tf.VarLenFeature(tf.int64),
+        'input_masks': tf.VarLenFeature(tf.int64),
+        'y_masks': tf.VarLenFeature(tf.int64),
+        'labels': tf.VarLenFeature(tf.int64),
+        'text': tf.VarLenFeature(tf.string),
+    }
+
+    example = tf.parse_single_example(serialized_example, features_spec)
+
+    return ({
+                'input_ids': tf.sparse.to_dense(example['input_ids']),
+                'input_masks': tf.sparse.to_dense(example['input_masks']),
+                'y_masks': tf.sparse.to_dense(example['y_masks']),
+                'text': example['text'],
+            },
+            tf.sparse.to_dense(example['labels']))
+
+
+def input_fn(tfrecord_ds_path, batch_size):
+    dataset = tf.data.TFRecordDataset([tfrecord_ds_path])\
+        .map(lambda record: parse(record)).shuffle(100).batch(batch_size).repeat(100)
+
+    return dataset
+
+
+def serving_input_receiver_fn():
+    """Serving input_fn that builds features from placeholders
+    https://www.tensorflow.org/guide/saved_model#prepare_serving_inputs
+    Returns
+    -------
+    tf.estimator.export.ServingInputReceiver
+    """
+    # TODO adapt me
+    input_ids_ph = tf.placeholder(shape=(None, None), dtype=tf.int32, name='token_indices_ph')
+    input_masks_ph = tf.placeholder(shape=(None, None), dtype=tf.int32, name='token_mask_ph')
+    y_masks_ph = tf.placeholder(shape=(None, None), dtype=tf.int32, name='y_mask_ph')
+    receiver_tensors = {
+        'input_ids': input_ids_ph,
+        'input_masks': input_masks_ph,
+        'y_masks': y_masks_ph,
+    }
+
+    return tf.estimator.export.ServingInputReceiver(receiver_tensors, receiver_tensors)
+
+
+def main(train_dataset_path, eval_dataset_path, model_save_path, batch_size):
     # load bert as Estimator:
     bert_ner_estimator = get_estimator(model_save_path)
 
-    start = time.clock()
-    start_dt = dt.datetime.now()
-    print("start at:")
-    print(start)
-    print(start_dt)
-    print("Start train")
+    train_spec = tf.estimator.TrainSpec(
+        input_fn = functools.partial(input_fn, tfrecord_ds_path=train_dataset_path, batch_size=batch_size),
+    )
 
-    train_inpf = functools.partial(input_fn, tfrecord_ds_path=train_dataset_path, batch_size=batch_size)
-    result = bert_ner_estimator.train(train_inpf)
+    export = tf.estimator.FinalExporter('exporter', serving_input_receiver_fn=serving_input_receiver_fn)
 
-    print("Fin train")
-    print(result)
+    eval_spec = tf.estimator.EvalSpec(
+        input_fn = functools.partial(input_fn, tfrecord_ds_path=eval_dataset_path),
+        throttle_secs=120,
+        start_delay_secs=120,
+        exporters=[export]
+    )
 
-    fintime = time.clock()
-    fin_dt = dt.datetime.now()
-    print("start at")
-    print(start)
-
-    print("fintime")
-    print(fintime)
-    print(fin_dt)
-    print("Total timedelta:")
-    print(fintime - start)
-    print(fin_dt - start_dt)
-
-    # Export it (How it saves without this string?)
-    print("Exporting model to %s" % model_save_path)
-
-    # bert_ner_estimator.export_saved_model('resources/BERT_NER_ESTIMATOR_saved_model',
-    bert_ner_estimator.export_saved_model(model_save_path, serving_input_receiver_fn)
-    print("Fin")
+    tf.estimator.train_and_evaluate(
+        bert_ner_estimator,
+        train_spec,
+        eval_spec
+    )
 
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_dataset', help='Path to TFRecord dataset for training', default='data/train.tfrecord', type=str)
+    parser.add_argument('--eval_dataset', help='Path to TFRecord dataset for evaluation', default='data/valid.tfrecord', type=str)
     parser.add_argument('--model_save_path', help='Path to save the resulting model', default='model/BERT_NER_ESTIMATOR', type=str)
     parser.add_argument('--batch_size', help='Size of Batch', default=512, type=int)
     args = parser.parse_args()
-    main(args.train_dataset, args.model_save_path, args.batch_size)
+    main(args.train_dataset, args.eval_dataset, args.model_save_path, args.batch_size)
