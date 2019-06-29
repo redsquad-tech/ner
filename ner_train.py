@@ -8,9 +8,6 @@ import functools
 import tensorflow as tf
 
 
-from settings import BATCH_SIZE
-
-
 def parse(serialized_example):
     """
     Function adapts features for the Estimator format

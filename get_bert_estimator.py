@@ -81,6 +81,6 @@ def get_estimator(model_save_path):
     return tf.estimator.Estimator(
         model_fn=model_fn,
         params={},
-        model_dir=model_save_path + '/process',
+        model_dir=model_save_path,
         config=my_checkpointing_config
     )
