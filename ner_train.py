@@ -35,7 +35,7 @@ def parse(serialized_example):
 
 def input_fn(tfrecord_ds_path, batch_size):
     dataset = tf.data.TFRecordDataset([tfrecord_ds_path])\
-        .map(lambda record: parse(record)).shuffle(100).batch(batch_size).repeat(100)
+        .map(lambda record: parse(record)).shuffle(100).batch(batch_size).repeat()
 
     return dataset
 
