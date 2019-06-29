@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.python.client import device_lib
 
 from settings import BERT_MODEL_PATH, TAGS_MAP
 from bert_ner_core import bert_ner_core
@@ -68,12 +69,14 @@ def model_fn(features, labels, mode, params):
 
     raise Exception('Unsupported Mode: %s!' % mode)
 
+strategy = tf.contrib.distribute.MirroredStrategy(num_gpus=len(device_lib.list_local_devices()))
 
 my_checkpointing_config = tf.estimator.RunConfig(
     # save_checkpoints_secs=60,
-    save_checkpoints_steps=1,
-    keep_checkpoint_max=20,
-    save_summary_steps=5,
+    save_checkpoints_steps=100,
+    keep_checkpoint_max=8,
+    save_summary_steps=100,
+    train_distribute=strategy,
 )
 
 
