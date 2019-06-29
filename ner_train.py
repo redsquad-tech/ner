@@ -64,15 +64,8 @@ def main(train_dataset_path, eval_dataset_path, batch_size):
     # load bert as Estimator:
     bert_ner_estimator = get_estimator()
 
-    early_stopping = tf.estimator.stop_if_no_decrease_hook(
-        bert_ner_estimator,
-        metric_name='loss',
-        max_steps_without_decrease=1000,
-        min_steps=100)
-
     train_spec = tf.estimator.TrainSpec(
         input_fn = functools.partial(input_fn, tfrecord_ds_path=train_dataset_path, batch_size=batch_size),
-        hooks=[early_stopping],
     )
 
     export = tf.estimator.BestExporter('exporter', serving_input_receiver_fn=serving_input_receiver_fn)
