@@ -3,7 +3,7 @@ from bert.modeling import BertConfig, BertModel
 
 import tensorflow as tf
 import numpy as np
-from settings import BERT_CONFIG_PATH, BERT_MODEL_PATH, N_TAGS
+from settings import BERT_CONFIG_PATH, N_TAGS
 from settings import SEQ_LEN
 n_tags = N_TAGS
 LEARNING_RATE = 1e-6

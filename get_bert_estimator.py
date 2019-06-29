@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from settings import BERT_MODEL_PATH, TAGS_MAP
+from settings import TAGS_MAP, RESOURCES_PATH
 from bert_ner_core import bert_ner_core
 
 
@@ -79,10 +79,10 @@ my_checkpointing_config = tf.estimator.RunConfig(
 )
 
 
-def get_estimator(model_save_path):
+def get_estimator():
     return tf.estimator.Estimator(
         model_fn=model_fn,
         params={},
-        model_dir=model_save_path,
+        model_dir=RESOURCES_PATH,
         config=my_checkpointing_config
     )

@@ -60,9 +60,9 @@ def serving_input_receiver_fn():
     return tf.estimator.export.ServingInputReceiver(receiver_tensors, receiver_tensors)
 
 
-def main(train_dataset_path, eval_dataset_path, model_save_path, batch_size):
+def main(train_dataset_path, eval_dataset_path, batch_size):
     # load bert as Estimator:
-    bert_ner_estimator = get_estimator(model_save_path)
+    bert_ner_estimator = get_estimator()
 
     train_spec = tf.estimator.TrainSpec(
         input_fn = functools.partial(input_fn, tfrecord_ds_path=train_dataset_path, batch_size=batch_size),
@@ -87,7 +87,6 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_dataset', help='Path to TFRecord dataset for training', default='data/train.tfrecord', type=str)
     parser.add_argument('--eval_dataset', help='Path to TFRecord dataset for evaluation', default='data/valid.tfrecord', type=str)
-    parser.add_argument('--model_save_path', help='Path to save the resulting model', default='model/BERT_NER_ESTIMATOR', type=str)
     parser.add_argument('--batch_size', help='Size of Batch', default=8, type=int)
     args = parser.parse_args()
-    main(args.train_dataset, args.eval_dataset, args.model_save_path, args.batch_size)
+    main(args.train_dataset, args.eval_dataset, args.batch_size)
